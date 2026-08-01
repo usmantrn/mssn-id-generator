@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id            Int       @id @default(autoincrement())
+  memberId      String    @unique           // MSSN-FUTB-0001
+  firstName     String
+  middleName    String?
+  lastName      String
+  email         String    @unique
+  phone         String    @unique
+  password      String
+  role          String    @default("member") // member | official | admin
+  position      String?                      // e.g. "Amir", "Secretary"
+  matricNo      String?                      // e.g. FUTB/CS/24/105
+  department    String?                      // e.g. Computer Science
+  level         String?                      // e.g. 100, 200, 300, 400
+  session       String    @default("2025/2026")
+  photoUrl      String?
+  cardUrl       String?                      // Generated PDF path
+  cardGenerated Boolean   @default(false)
+  expiryDate    DateTime?                    // Officials only (1 year)
+  issueDate     DateTime  @default(now())
+  status        String    @default("active") // active | suspended
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("members")
+}
+
+model DeletionLog {
+  id            Int      @id @default(autoincrement())
+  // Deleted member snapshot
+  memberId      String
+  firstName     String
+  middleName    String?
+  lastName      String
+  email         String
+  phone         String
+  role          String
+  position      String?
+  session       String?
+  matricNo      String?
+  department    String?
+  level         String?
+  // Who deleted & when
+  deletedAt     DateTime @default(now())
+  deletedById   String   // admin's memberId
+  deletedByName String   // admin's full name
+
+  @@map("deletion_logs")
+}
