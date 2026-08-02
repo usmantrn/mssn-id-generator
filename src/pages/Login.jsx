@@ -29,7 +29,8 @@ export default function Login() {
       const member = await login(form.email, form.password);
       navigate(member.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Check your credentials.');
+      const errorData = err.response?.data?.error;
+      setError(typeof errorData === 'string' ? errorData : (errorData?.message || 'Login failed. Check your credentials.'));
     } finally {
       setLoading(false);
     }

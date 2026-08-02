@@ -29,7 +29,8 @@ export default function Register() {
       setSuccess(true);
       setTimeout(() => navigate('/login', { state: { message: 'Registration successful! Please login.' } }), 2500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      const errorData = err.response?.data?.error;
+      setError(typeof errorData === 'string' ? errorData : (errorData?.message || 'Registration failed. Please try again.'));
     } finally {
       setLoading(false);
     }
