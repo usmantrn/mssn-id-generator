@@ -87,7 +87,7 @@ export const PortraitCard = ({ member, assets, frontRef, backRef }) => {
 };
 
 export const LandscapeCard = ({ member, assets, frontRef, backRef }) => {
-  const { mssnLogo, futbLogo } = assets;
+  const { mssnLogo, futbLogo, amirSig } = assets;
   const photo = member.photoUrl || '';
   const qrUrl = `https://mssn-id-generator.vercel.app/verify/${member.memberId}`;
   const name = `${member.firstName} ${member.middleName || ''} ${member.lastName}`.replace(/\s+/g, ' ').trim().toUpperCase();
