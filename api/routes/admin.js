@@ -5,7 +5,7 @@ import multer from 'multer';
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
-import sharp from 'sharp';
+
 import { fileURLToPath } from 'url';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import prisma from '../prisma.js';
@@ -223,15 +223,7 @@ router.post('/members/:id/photo', upload.single('photo'), async (req, res) => {
 
     const filename = `${Date.now()}-admin-${req.params.id}.jpg`;
 
-    const processedImage = await sharp(req.file.buffer)
-      .resize(320, 400, { fit: 'cover', position: 'top' })
-      .flatten({ background: { r: 255, g: 255, b: 255 } })
-      .modulate({ brightness: 1.05, saturation: 1.1 })
-      .sharpen({ sigma: 0.8 })
-      .jpeg({ quality: 92 })
-      .toBuffer();
-
-    const blob = await put(`photos/${filename}`, processedImage, {
+    const blob = await put(`photos/${filename}`, req.file.buffer, {
       access: 'public',
       contentType: 'image/jpeg',
     });
