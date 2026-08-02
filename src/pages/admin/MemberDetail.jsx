@@ -6,17 +6,7 @@ import Button from '../../components/ui/Button.jsx';
 import { motion } from 'framer-motion';
 import { ArrowLeft, IdCard, Download, RefreshCw, Shield, User, Trash2, Camera } from 'lucide-react';
 
-const POSITIONS = [
-  'Amir', 'Naib Amir', 'Secretary',
-  'Director of Strategy', 'Director of Education', 'Director of Women Affairs',
-  'Director of Financial Secretary', 'Treasurer', 'Director of Operation',
-  'Director of ICT', 'Director of Welfare', "Director of Da'awah",
-  // Assistants
-  'Asst. Amir', 'Asst. Naib Amir', 'Asst. Secretary',
-  'Asst. Director of Strategy', 'Asst. Director of Education', 'Asst. Director of Women Affairs',
-  'Asst. Director of Financial Secretary', 'Asst. Treasurer', 'Asst. Director of Operation',
-  'Asst. Director of ICT', 'Asst. Director of Welfare', "Asst. Director of Da'awah",
-];
+// Positions will now be fetched dynamically from the backend
 
 export default function MemberDetail() {
   const { id } = useParams();
@@ -25,6 +15,7 @@ export default function MemberDetail() {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState('member');
   const [position, setPosition] = useState('');
+  const [positions, setPositions] = useState([]);
   const [updating, setUpdating] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -32,13 +23,18 @@ export default function MemberDetail() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    axios.get(`/api/admin/members/${id}`)
-      .then(r => {
-        setMember(r.data.member);
-        setRole(r.data.member.role);
-        setPosition(r.data.member.position || '');
-      })
-      .finally(() => setLoading(false));
+    Promise.all([
+      axios.get(`/api/admin/members/${id}`),
+      axios.get('/api/admin/positions')
+    ])
+    .then(([memberRes, posRes]) => {
+      setMember(memberRes.data.member);
+      setRole(memberRes.data.member.role);
+      setPosition(memberRes.data.member.position || '');
+      setPositions(posRes.data.positions);
+    })
+    .catch(err => console.error(err))
+    .finally(() => setLoading(false));
   }, [id]);
 
   const handleRoleUpdate = async (e) => {
@@ -211,7 +207,7 @@ export default function MemberDetail() {
                 <select value={position} onChange={e => setPosition(e.target.value)}
                   disabled={role !== 'official'} className="input-field disabled:opacity-50">
                   <option value="">— Select position —</option>
-                  {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                  {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
                 </select>
               </div>
             </div>

@@ -11,6 +11,7 @@ import Members from './pages/admin/Members.jsx';
 import MemberDetail from './pages/admin/MemberDetail.jsx';
 import BulkUpload from './pages/admin/BulkUpload.jsx';
 import DeletionLogs from './pages/admin/DeletionLogs.jsx';
+import Positions from './pages/admin/Positions.jsx';
 
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/admin/members/:id" element={<ProtectedRoute adminOnly><MemberDetail /></ProtectedRoute>} />
           <Route path="/admin/bulk-upload" element={<ProtectedRoute adminOnly><BulkUpload /></ProtectedRoute>} />
           <Route path="/admin/deletion-logs" element={<ProtectedRoute adminOnly><DeletionLogs /></ProtectedRoute>} />
+          <Route path="/admin/positions" element={<ProtectedRoute adminOnly><Positions /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

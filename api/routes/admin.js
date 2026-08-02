@@ -285,4 +285,42 @@ router.post('/settings/signature', upload.single('signature'), async (req, res) 
   }
 });
 
+// --- POSITIONS / ROLES ---
+
+// GET /api/admin/positions
+router.get('/positions', async (req, res) => {
+  try {
+    const positions = await prisma.position.findMany({ orderBy: { id: 'asc' } });
+    res.json({ success: true, positions });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch positions' });
+  }
+});
+
+// POST /api/admin/positions
+router.post('/positions', async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Position name is required' });
+    
+    const exists = await prisma.position.findUnique({ where: { name: name.trim() } });
+    if (exists) return res.status(400).json({ error: 'Position already exists' });
+    
+    const position = await prisma.position.create({ data: { name: name.trim() } });
+    res.json({ success: true, position });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create position' });
+  }
+});
+
+// DELETE /api/admin/positions/:id
+router.delete('/positions/:id', async (req, res) => {
+  try {
+    await prisma.position.delete({ where: { id: Number(req.params.id) } });
+    res.json({ success: true, message: 'Position deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete position' });
+  }
+});
+
 export default router;

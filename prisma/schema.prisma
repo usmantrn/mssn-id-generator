@@ -56,3 +56,10 @@ model DeletionLog {
 
   @@map("deletion_logs")
 }
+
+model Position {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  @@map("positions")
+}

@@ -22,6 +22,7 @@ export default function DashboardLayout({ children }) {
   const adminNav = [
     { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/members', icon: Users, label: 'Members' },
+    { to: '/admin/positions', icon: Shield, label: 'Roles' },
     { to: '/admin/bulk-upload', icon: Upload, label: 'Bulk Upload' },
   ];
 
