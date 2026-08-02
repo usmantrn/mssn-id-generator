@@ -1,5 +1,5 @@
 import React from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Using standard 85.6mm x 54mm ID card aspect ratio (or portrait 54mm x 85.6mm)
 // We will render it at 3x resolution (approx 1000px) for crisp PDF generation
@@ -112,7 +112,7 @@ export const LandscapeCard = React.forwardRef(({ member, assets }, ref) => {
         
         <div style={{ width: '295px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 118px 41px 0', flexShrink: 0 }}>
           <div style={{ padding: '8px', background: '#fff', borderRadius: '12px', border: '2px solid #eaeaea', boxShadow: '0 4px 8px rgba(0,0,0,0.05)' }}>
-            <QRCode value={qrUrl} size={150} level="M" />
+            <QRCodeSVG value={qrUrl} size={150} level="M" />
           </div>
         </div>
       </div>
