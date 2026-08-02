@@ -1,4 +1,5 @@
 import express from 'express';
+import { put } from '@vercel/blob';
 import { parse } from 'csv-parse/sync';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
@@ -221,26 +222,26 @@ router.post('/members/:id/photo', upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No photo uploaded' });
 
-    const photosDir = path.join(__dirname, '../../uploads/photos');
-    if (!fs.existsSync(photosDir)) fs.mkdirSync(photosDir, { recursive: true });
-
     const filename = `${Date.now()}-admin-${req.params.id}.jpg`;
-    const outputPath = path.join(photosDir, filename);
 
-    await sharp(req.file.buffer)
+    const processedImage = await sharp(req.file.buffer)
       .resize(320, 400, { fit: 'cover', position: 'top' })
       .flatten({ background: { r: 255, g: 255, b: 255 } })
       .modulate({ brightness: 1.05, saturation: 1.1 })
       .sharpen({ sigma: 0.8 })
       .jpeg({ quality: 92 })
-      .toFile(outputPath);
+      .toBuffer();
 
-    const photoUrl = `/api/uploads/photos/${filename}`;
+    const blob = await put(`photos/${filename}`, processedImage, {
+      access: 'public',
+      contentType: 'image/jpeg',
+    });
+
     await prisma.member.update({
       where: { id: Number(req.params.id) },
-      data: { photoUrl, cardGenerated: false }
+      data: { photoUrl: blob.url, cardGenerated: false }
     });
-    res.json({ success: true, photoUrl });
+    res.json({ success: true, photoUrl: blob.url });
   } catch (err) {
     console.error('Admin photo upload error:', err);
     res.status(500).json({ error: 'Photo upload failed' });
@@ -270,13 +271,11 @@ router.post('/settings/signature', upload.single('signature'), async (req, res) 
   try {
     if (!req.file) return res.status(400).json({ error: 'No signature file uploaded' });
     
-    const assetsDir = path.join(__dirname, '../../card-assets');
-    if (!fs.existsSync(assetsDir)) {
-      fs.mkdirSync(assetsDir, { recursive: true });
-    }
-
-    const filePath = path.join(assetsDir, 'amir-sig.png');
-    fs.writeFileSync(filePath, req.file.buffer);
+    await put('card-assets/amir-sig.png', req.file.buffer, {
+      access: 'public',
+      contentType: 'image/png',
+      addRandomSuffix: false // always overwrite amir-sig.png
+    });
 
     res.json({ success: true, message: 'Signature updated successfully' });
   } catch (err) {

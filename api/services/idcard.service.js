@@ -1,30 +1,19 @@
 import puppeteer from 'puppeteer';
 import QRCode from 'qrcode';
 import fs from 'fs';
-import fsAsync from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import prisma from '../prisma.js';
+import { put } from '@vercel/blob';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const CARD_ASSETS = path.join(__dirname, '../../card-assets');
-const UPLOADS_DIR = path.join(__dirname, '../../uploads');
 
 function loadAssetBase64(filename) {
   const fp = path.join(CARD_ASSETS, filename);
-  if (!fs.existsSync(fp)) return '';
-  const ext = path.extname(fp).replace('.', '').replace('jpg', 'jpeg');
-  const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
-  return `data:${mime};base64,${fs.readFileSync(fp).toString('base64')}`;
-}
-
-function loadPhotoBase64(photoUrl) {
-  if (!photoUrl) return '';
-  const filename = path.basename(photoUrl);
-  const fp = path.join(UPLOADS_DIR, 'photos', filename);
   if (!fs.existsSync(fp)) return '';
   const ext = path.extname(fp).replace('.', '').replace('jpg', 'jpeg');
   const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
@@ -48,7 +37,7 @@ async function generatePortraitCardHtml(member) {
   const mssnLogo = loadAssetBase64('mssn-logo.jpeg');
   const futbLogo = loadAssetBase64('futb-logo.jpeg');
   const amirSig = loadAssetBase64('amir-sig.png');
-  const photo = loadPhotoBase64(member.photoUrl);
+  const photo = member.photoUrl || '';
   const qr = await generateQR(`https://mssn-futb.com/verify/${member.memberId}`);
   const name = `${member.firstName} ${member.middleName || ''} ${member.lastName}`.replace(/\s+/g, ' ').toUpperCase();
   const position = member.role === 'official' ? (member.position || 'OFFICIAL').toUpperCase() : 'MEMBER';
@@ -249,7 +238,7 @@ async function generateLandscapeCardHtml(member) {
   const mssnLogo = loadAssetBase64('mssn-logo.jpeg');
   const futbLogo = loadAssetBase64('futb-logo.jpeg');
   const amirSig = loadAssetBase64('amir-sig.png');
-  const photo = loadPhotoBase64(member.photoUrl);
+  const photo = member.photoUrl || '';
   const qr = await generateQR(`https://mssn-futb.com/verify/${member.memberId}`);
   const name = `${member.firstName} ${member.middleName || ''} ${member.lastName}`.replace(/\s+/g, ' ').trim().toUpperCase();
   const post = (member.role === 'official' ? (member.position || 'Official') : 'Member').toUpperCase();
@@ -413,11 +402,8 @@ export async function generateCardPdf(member) {
     ? await generateLandscapeCardHtml(member)
     : await generatePortraitCardHtml(member);
 
-  const cardsDir = path.join(UPLOADS_DIR, 'cards');
-  await fsAsync.mkdir(cardsDir, { recursive: true });
-
   const filename = `${crypto.randomUUID()}.pdf`;
-  const safePath = path.join(cardsDir, filename);
+  let blobUrl = '';
 
   let browser;
   try {
@@ -434,12 +420,17 @@ export async function generateCardPdf(member) {
       : { width: '85.6mm', height: '135mm', printBackground: true, margin: { top: 0, right: 0, bottom: 0, left: 0 } };
 
     const pdfBuffer = await page.pdf(pdfOptions);
-    await fsAsync.writeFile(safePath, pdfBuffer);
+    
+    const blob = await put(`cards/${filename}`, pdfBuffer, {
+      access: 'public',
+      contentType: 'application/pdf'
+    });
+    blobUrl = blob.url;
   } finally {
     if (browser) await browser.close();
   }
 
-  return `/api/cards/${filename}`;
+  return blobUrl;
 }
 
 // ─────────────────────────────────────────────────
