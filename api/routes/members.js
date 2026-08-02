@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import sharp from 'sharp';
+
 import { fileURLToPath } from 'url';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../prisma.js';
@@ -29,24 +29,10 @@ import { put } from '@vercel/blob';
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 async function processAndSavePhoto(buffer, filename) {
-  // Process: resize to passport dimensions (320x400px), add a clean white background,
-  // sharpen, and normalize brightness — makes any photo look clean and professional
-  const processedImage = await sharp(buffer)
-    .resize(320, 400, {
-      fit: 'cover',       // crop to fill exactly
-      position: 'top'     // bias toward face (top of image)
-    })
-    .flatten({ background: { r: 255, g: 255, b: 255 } }) // white bg for transparent PNGs
-    .modulate({ brightness: 1.05, saturation: 1.1 })      // slightly brighten & saturate
-    .sharpen({ sigma: 0.8 })                               // crisp details
-    .jpeg({ quality: 92 })
-    .toBuffer();
-
-  const blob = await put(`photos/${filename}`, processedImage, {
+  const blob = await put(`photos/${filename}`, buffer, {
     access: 'public',
     contentType: 'image/jpeg',
   });
-
   return blob.url;
 }
 

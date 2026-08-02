@@ -17,7 +17,8 @@ export async function generateAndDownloadPdf(member) {
       document.body.appendChild(container);
 
       const root = createRoot(container);
-      const cardRef = React.createRef();
+      const frontRef = React.createRef();
+      const backRef = React.createRef();
 
       const assets = {
         mssnLogo: '/card-assets/mssn-logo.jpeg',
@@ -28,34 +29,47 @@ export async function generateAndDownloadPdf(member) {
       const CardComponent = isOfficial ? LandscapeCard : PortraitCard;
 
       root.render(
-        <CardComponent member={member} assets={assets} ref={cardRef} />
+        <CardComponent member={member} assets={assets} frontRef={frontRef} backRef={backRef} />
       );
 
       // Wait a moment for images to load (especially the cross-origin photo)
       setTimeout(async () => {
         try {
-          if (!cardRef.current) throw new Error("Card ref not attached");
+          if (!frontRef.current || !backRef.current) throw new Error("Card refs not attached");
           
-          const canvas = await html2canvas(cardRef.current, {
+          const pdf = isOfficial
+            ? new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 54] })
+            : new jsPDF({ orientation: 'portrait', unit: 'mm', format: [54, 85.6] });
+
+          // Front side
+          const frontCanvas = await html2canvas(frontRef.current, {
             scale: 2,
             useCORS: true,
             allowTaint: false,
             backgroundColor: '#ffffff',
           });
-
-          // PDF dimensions
-          // Landscape: 85.6 x 54
-          // Portrait: 54 x 85.6
-          const pdf = isOfficial
-            ? new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 54] })
-            : new jsPDF({ orientation: 'portrait', unit: 'mm', format: [54, 85.6] });
-
-          const imgData = canvas.toDataURL('image/jpeg', 1.0);
+          const frontImg = frontCanvas.toDataURL('image/jpeg', 1.0);
           
           if (isOfficial) {
-            pdf.addImage(imgData, 'JPEG', 0, 0, 85.6, 54);
+            pdf.addImage(frontImg, 'JPEG', 0, 0, 85.6, 54);
           } else {
-            pdf.addImage(imgData, 'JPEG', 0, 0, 54, 85.6);
+            pdf.addImage(frontImg, 'JPEG', 0, 0, 54, 85.6);
+          }
+
+          // Back side
+          pdf.addPage();
+          const backCanvas = await html2canvas(backRef.current, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+          });
+          const backImg = backCanvas.toDataURL('image/jpeg', 1.0);
+
+          if (isOfficial) {
+            pdf.addImage(backImg, 'JPEG', 0, 0, 85.6, 54);
+          } else {
+            pdf.addImage(backImg, 'JPEG', 0, 0, 54, 85.6);
           }
 
           pdf.save(`MSSN_ID_${member.memberId}.pdf`);
