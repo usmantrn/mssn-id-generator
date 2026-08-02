@@ -5,6 +5,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout.jsx';
 import Button from '../../components/ui/Button.jsx';
 import { motion } from 'framer-motion';
 import { ArrowLeft, IdCard, Download, RefreshCw, Shield, User, Trash2, Camera } from 'lucide-react';
+import { generateAndDownloadPdf } from '../../utils/pdfGenerator';
 
 // Positions will now be fetched dynamically from the backend
 
@@ -56,10 +57,13 @@ export default function MemberDetail() {
     setGenerating(true);
     setMsg('');
     try {
-      const { data } = await axios.post(`/api/admin/members/${id}/generate-card`);
-      setMember(prev => ({ ...prev, cardUrl: data.cardUrl, cardGenerated: true }));
+      // 1. Generate and download PDF on the client
+      await generateAndDownloadPdf(member);
+      
+      // 2. Notify backend to mark card as generated
+      await axios.post(`/api/admin/members/${id}/generate-card`);
+      setMember(prev => ({ ...prev, cardGenerated: true }));
       setMsg('✅ Card generated!');
-      window.open(data.cardUrl, '_blank');
     } catch (err) {
       setMsg('❌ ' + (err.response?.data?.error || 'Generation failed'));
     } finally {
@@ -235,15 +239,8 @@ export default function MemberDetail() {
           </div>
           <div className="flex gap-3">
             <Button onClick={handleGenerate} loading={generating} className="flex-1">
-              {member.cardGenerated ? <><RefreshCw size={15} /> Regenerate Card</> : <><IdCard size={15} /> Generate Card</>}
+              {member.cardGenerated ? <><Download size={15} /> Download Card Again</> : <><IdCard size={15} /> Generate & Download Card</>}
             </Button>
-            {member.cardGenerated && member.cardUrl && (
-              <a href={member.cardUrl} target="_blank" rel="noreferrer">
-                <Button variant="outline">
-                  <Download size={15} /> Download
-                </Button>
-              </a>
-            )}
           </div>
         </div>
 

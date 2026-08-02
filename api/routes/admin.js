@@ -9,7 +9,6 @@ import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import prisma from '../prisma.js';
-import { generateCardPdf } from '../services/idcard.service.js';
 import { generateMemberId } from '../utils/idgen.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -115,11 +114,11 @@ router.put('/members/:id/status', async (req, res) => {
 // POST /api/admin/members/:id/generate-card
 router.post('/members/:id/generate-card', async (req, res) => {
   try {
-    const member = await prisma.member.findUnique({ where: { id: Number(req.params.id) } });
-    if (!member) return res.status(404).json({ error: 'Member not found' });
-    const cardUrl = await generateCardPdf(member);
-    await prisma.member.update({ where: { id: member.id }, data: { cardUrl, cardGenerated: true } });
-    res.json({ success: true, cardUrl });
+    const member = await prisma.member.update({ 
+      where: { id: Number(req.params.id) }, 
+      data: { cardGenerated: true } 
+    });
+    res.json({ success: true, message: 'Card marked as generated' });
   } catch (err) {
     console.error('Admin card gen error:', err);
     res.status(500).json({ error: 'Card generation failed' });

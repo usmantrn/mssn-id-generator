@@ -8,6 +8,7 @@ import {
   IdCard, Download, RefreshCw, CheckCircle, Clock,
   User, Calendar, Shield, Hash
 } from 'lucide-react';
+import { generateAndDownloadPdf } from '../../utils/pdfGenerator';
 
 export default function Home() {
   const { user, refreshUser } = useAuth();
@@ -21,12 +22,16 @@ export default function Home() {
     setGenerating(true);
     setMsg('');
     try {
-      const { data } = await axios.post('/api/members/me/generate-card');
+      // 1. Generate and download PDF on the client
+      await generateAndDownloadPdf(user);
+      
+      // 2. Notify backend to mark card as generated
+      await axios.post('/api/members/me/generate-card');
       await refreshUser();
+      
       setMsg('✅ ID card generated successfully!');
-      // Auto-open download
-      window.open(data.cardUrl, '_blank');
     } catch (err) {
+      console.error(err);
       setMsg('❌ ' + (err.response?.data?.error || 'Generation failed. Please try again.'));
     } finally {
       setGenerating(false);
@@ -115,15 +120,8 @@ export default function Home() {
             {/* Action buttons */}
             <div className="flex gap-3">
               <Button onClick={handleGenerateCard} loading={generating} className="flex-1">
-                {user?.cardGenerated ? <><RefreshCw size={16} /> Regenerate</> : <><IdCard size={16} /> Generate Card</>}
+                {user?.cardGenerated ? <><Download size={16} /> Download Card Again</> : <><IdCard size={16} /> Generate & Download Card</>}
               </Button>
-              {user?.cardGenerated && user?.cardUrl && (
-                <a href={user.cardUrl} target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download size={16} /> Download PDF
-                  </Button>
-                </a>
-              )}
             </div>
 
             {msg && (

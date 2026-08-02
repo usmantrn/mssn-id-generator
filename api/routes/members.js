@@ -6,7 +6,6 @@ import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../prisma.js';
-import { generateCardPdf } from '../services/idcard.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,20 +23,15 @@ function toUpperStr(str) {
   return str.trim().toUpperCase();
 }
 
+import { put } from '@vercel/blob';
+
 // Store raw uploads in memory, process with sharp before saving
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-const PHOTOS_DIR = path.join(__dirname, '../../uploads/photos');
-
 async function processAndSavePhoto(buffer, filename) {
-  // Ensure directory exists
-  if (!fs.existsSync(PHOTOS_DIR)) fs.mkdirSync(PHOTOS_DIR, { recursive: true });
-
-  const outputPath = path.join(PHOTOS_DIR, filename);
-
   // Process: resize to passport dimensions (320x400px), add a clean white background,
   // sharpen, and normalize brightness — makes any photo look clean and professional
-  await sharp(buffer)
+  const processedImage = await sharp(buffer)
     .resize(320, 400, {
       fit: 'cover',       // crop to fill exactly
       position: 'top'     // bias toward face (top of image)
@@ -46,9 +40,14 @@ async function processAndSavePhoto(buffer, filename) {
     .modulate({ brightness: 1.05, saturation: 1.1 })      // slightly brighten & saturate
     .sharpen({ sigma: 0.8 })                               // crisp details
     .jpeg({ quality: 92 })
-    .toFile(outputPath);
+    .toBuffer();
 
-  return outputPath;
+  const blob = await put(`photos/${filename}`, processedImage, {
+    access: 'public',
+    contentType: 'image/jpeg',
+  });
+
+  return blob.url;
 }
 
 // GET /api/members/me
@@ -104,9 +103,8 @@ router.post('/me/photo', authenticate, upload.single('photo'), async (req, res) 
     }
 
     const filename = `${Date.now()}-${req.user.id}.jpg`;
-    await processAndSavePhoto(req.file.buffer, filename);
+    const photoUrl = await processAndSavePhoto(req.file.buffer, filename);
 
-    const photoUrl = `/api/uploads/photos/${filename}`;
     await prisma.member.update({ where: { id: req.user.id }, data: { photoUrl, cardGenerated: false } });
     res.json({ success: true, photoUrl });
   } catch (err) {
@@ -118,15 +116,14 @@ router.post('/me/photo', authenticate, upload.single('photo'), async (req, res) 
 // POST /api/members/me/generate-card
 router.post('/me/generate-card', authenticate, async (req, res) => {
   try {
-    const member = await prisma.member.findUnique({ where: { id: req.user.id } });
-    if (!member) return res.status(404).json({ error: 'Member not found' });
-
-    const cardUrl = await generateCardPdf(member);
-    await prisma.member.update({ where: { id: req.user.id }, data: { cardUrl, cardGenerated: true } });
-    res.json({ success: true, cardUrl });
+    const member = await prisma.member.update({ 
+      where: { id: req.user.id }, 
+      data: { cardGenerated: true } 
+    });
+    res.json({ success: true, message: 'Card marked as generated' });
   } catch (err) {
-    console.error('Card generation error:', err);
-    res.status(500).json({ error: 'Card generation failed. Please try again.' });
+    console.error('Card generation status error:', err);
+    res.status(500).json({ error: 'Failed to update card status.' });
   }
 });
 
