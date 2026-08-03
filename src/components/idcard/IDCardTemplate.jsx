@@ -34,9 +34,9 @@ export const PortraitCard = ({ member, assets, frontRef, backRef }) => {
             <div style={{ flex: 1, height: '4px', background: '#165a32' }} />
           </div>
           
-          <div style={{ marginTop: '30px', width: '354px', height: '425px', border: '6px solid #165a32', borderRadius: '24px', overflow: 'hidden', background: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {photo ? <img src={photo} crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ opacity: 0.4 }}>No Photo</div>}
-          </div>
+          <div style={{ marginTop: '30px', width: '354px', height: '425px', border: '6px solid #165a32', borderRadius: '24px', overflow: 'hidden', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0px 4px 12px rgba(0,0,0,0.1)' }}>
+          {photo ? <img src={photo} crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'contrast(1.05) brightness(1.05) saturate(1.1)' }} /> : <div style={{ opacity: 0.4 }}>No Photo</div>}
+        </div>
         </div>
 
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '614px', background: '#165a32', overflow: 'hidden' }}>
@@ -104,57 +104,65 @@ export const LandscapeCard = ({ member, assets, frontRef, backRef }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* ═══ FRONT ═══ */}
-      <div ref={frontRef} style={{ width: '1011px', height: '638px', background: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", system-ui, sans-serif' }}>
-        {mssnLogo && <img src={mssnLogo} alt="Background Watermark" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.04, width: '413px', height: '413px', zIndex: 0 }} />}
+      <div ref={frontRef} style={{ width: '1011px', height: '638px', background: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", system-ui, sans-serif', boxSizing: 'border-box', border: '1px solid #eaeaea' }}>
+        {/* Subtle Watermark */}
+        {mssnLogo && <img src={mssnLogo} alt="Background Watermark" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.03, width: '450px', height: '450px', zIndex: 0 }} />}
         
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px 12px', borderBottom: '2px solid #ccc', position: 'relative', zIndex: 1 }}>
-          {futbLogo ? <img src={futbLogo} style={{ width: '118px', height: '118px', objectFit: 'contain', flexShrink: 0 }} /> : <div style={{ width: '118px', height: '118px' }} />}
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 12px' }}>
-            <div style={{ fontSize: '27px', fontWeight: 900, color: '#165a32', lineHeight: 1.2, letterSpacing: '1px' }}>MUSLIM STUDENTS' SOCIETY OF NIGERIA</div>
-            <div style={{ fontSize: '21px', color: '#1a3a7a', fontWeight: 700, lineHeight: 1.3 }}>FEDERAL UNIVERSITY OF TECHNOLOGY BABURA CHAPTER</div>
-            <div style={{ fontSize: '17px', color: '#555', fontWeight: 600, fontStyle: 'italic', marginTop: '6px' }}>P.M.B. 2022, Babura, Nigeria.</div>
+        {/* Header Area */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px 10px', borderBottom: '3px solid #165a32', position: 'relative', zIndex: 1 }}>
+          {futbLogo ? <img src={futbLogo} style={{ width: '100px', height: '100px', objectFit: 'contain', flexShrink: 0 }} /> : <div style={{ width: '100px', height: '100px' }} />}
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 16px' }}>
+            <div style={{ fontSize: '28px', fontWeight: 900, color: '#165a32', lineHeight: 1.1, letterSpacing: '1px' }}>MUSLIM STUDENTS' SOCIETY OF NIGERIA</div>
+            <div style={{ fontSize: '20px', color: '#1a3a7a', fontWeight: 800, lineHeight: 1.4, marginTop: '4px' }}>FEDERAL UNIVERSITY OF TECHNOLOGY BABURA CHAPTER</div>
+            <div style={{ fontSize: '15px', color: '#555', fontWeight: 600, fontStyle: 'italic', marginTop: '4px' }}>P.M.B. 2022, Babura, Nigeria.</div>
           </div>
-          {mssnLogo ? <img src={mssnLogo} style={{ width: '118px', height: '118px', objectFit: 'contain', flexShrink: 0 }} /> : <div style={{ width: '118px', height: '118px' }} />}
+          {mssnLogo ? <img src={mssnLogo} style={{ width: '100px', height: '100px', objectFit: 'contain', flexShrink: 0 }} /> : <div style={{ width: '100px', height: '100px' }} />}
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '2px solid #eaeaea', background: '#fdfdfd', position: 'relative', zIndex: 1 }}>
-          <div style={{ background: '#b22222', color: '#fff', fontSize: '20px', fontWeight: 800, padding: '12px 30px', letterSpacing: '2px', borderRadius: '12px' }}>
-            {member.role === 'official' ? 'OFFICIAL ID CARD' : 'MEMBERSHIP ID CARD'}
+        {/* Official Banner */}
+        <div style={{ background: 'linear-gradient(90deg, #165a32 0%, #1a3a7a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 32px', position: 'relative', zIndex: 1, boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+          <div style={{ color: '#fff', fontSize: '22px', fontWeight: 900, letterSpacing: '4px' }}>
+            OFFICIAL ID CARD
           </div>
-          <div style={{ fontSize: '20px', color: '#555', fontWeight: 600 }}>Academic Session: {member.session || '2025/2026'}</div>
+          <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.9)', fontWeight: 600, letterSpacing: '1px' }}>SESSION: {member.session || '2025/2026'}</div>
         </div>
         
-        <div style={{ display: 'flex', height: '378px', position: 'relative', zIndex: 1 }}>
-          <div style={{ width: '283px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRight: '2px solid #eaeaea' }}>
-            {photo ? <img src={photo} crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ opacity: 0.6 }}>No Photo</div>}
+        {/* Main Content Area */}
+        <div style={{ display: 'flex', height: '390px', position: 'relative', zIndex: 1, padding: '20px 24px', boxSizing: 'border-box' }}>
+          
+          {/* Photo Section (Left) */}
+          <div style={{ width: '240px', height: '300px', background: '#ffffff', borderRadius: '16px', overflow: 'hidden', flexShrink: 0, border: '4px solid #165a32', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {photo ? <img src={photo} crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'contrast(1.05) brightness(1.05) saturate(1.1)' }} /> : <div style={{ opacity: 0.4, fontWeight: 600 }}>No Photo</div>}
           </div>
           
-          <div style={{ flex: 1, padding: '18px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <table style={{ width: '100%', marginLeft: '24px', borderCollapse: 'collapse' }}>
-              <tbody>
-                {[
-                  { label: 'NAME', value: name },
-                  { label: 'POST', value: post },
-                  { label: 'DATE ISSUE', value: issueDate },
-                  { label: 'DATE EXPIRY', value: expiryDate }
-                ].map((row, i) => (
-                  <tr key={i}>
-                    <td style={{ color: '#555', whiteSpace: 'nowrap', fontSize: '19px', fontWeight: 700, textTransform: 'uppercase', paddingRight: '24px', paddingBottom: '12px' }}>{row.label}:</td>
-                    <td style={{ color: '#111', fontSize: '21px', fontWeight: 900, whiteSpace: 'nowrap', paddingLeft: '12px', paddingBottom: '12px' }}>{row.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div style={{ width: '295px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 118px 41px 0', flexShrink: 0 }}>
-            <div style={{ padding: '8px', background: '#fff', borderRadius: '12px', border: '2px solid #eaeaea', boxShadow: '0 4px 8px rgba(0,0,0,0.05)' }}>
-              <QRCodeCanvas value={qrUrl} size={150} level="M" />
+          {/* Details Section (Center) */}
+          <div style={{ flex: 1, padding: '10px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '16px', alignItems: 'center' }}>
+              <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>NAME:</div>
+              <div style={{ color: '#111', fontSize: '26px', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px' }}>{name}</div>
+
+              <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '12px' }}>POST:</div>
+              <div style={{ color: '#165a32', fontSize: '22px', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px', marginTop: '12px' }}>{post}</div>
+
+              <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '12px' }}>ID NO:</div>
+              <div style={{ color: '#111', fontSize: '20px', fontWeight: 800, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px', marginTop: '12px' }}>{member.memberId}</div>
+
+              <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '12px' }}>ISSUED:</div>
+              <div style={{ color: '#111', fontSize: '19px', fontWeight: 700, textTransform: 'uppercase', marginTop: '12px' }}>{issueDate}</div>
             </div>
           </div>
+          
+          {/* QR Code Section (Right) */}
+          <div style={{ width: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ padding: '10px', background: '#fff', borderRadius: '16px', border: '3px solid #1a3a7a', boxShadow: '0 6px 16px rgba(0,0,0,0.08)' }}>
+              <QRCodeCanvas value={qrUrl} size={140} level="M" />
+            </div>
+            <div style={{ marginTop: '12px', fontSize: '12px', fontWeight: 700, color: '#1a3a7a', letterSpacing: '1px', textAlign: 'center' }}>SCAN TO VERIFY</div>
+          </div>
         </div>
         
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '47px', display: 'flex', zIndex: 2 }}>
+        {/* Footer Bar */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40px', display: 'flex', zIndex: 2 }}>
           <div style={{ flex: 1, background: '#165a32' }} />
           <div style={{ flex: 1, background: '#1a3a7a' }} />
           <div style={{ flex: 1, background: '#4a90c4' }} />
@@ -162,23 +170,46 @@ export const LandscapeCard = ({ member, assets, frontRef, backRef }) => {
       </div>
 
       {/* ═══ BACK ═══ */}
-      <div ref={backRef} style={{ width: '1011px', height: '638px', background: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", system-ui, sans-serif' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '35px', padding: '30px 24px 12px' }}>
-          {futbLogo && <img src={futbLogo} style={{ width: '130px', height: '130px', objectFit: 'contain' }} />}
-          {mssnLogo && <img src={mssnLogo} style={{ width: '130px', height: '130px', objectFit: 'contain' }} />}
+      <div ref={backRef} style={{ width: '1011px', height: '638px', background: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", system-ui, sans-serif', boxSizing: 'border-box', border: '1px solid #eaeaea' }}>
+        
+        {/* Background Pattern */}
+        {mssnLogo && <img src={mssnLogo} style={{ position: 'absolute', top: '-10%', right: '-5%', width: '400px', height: '400px', opacity: 0.05, transform: 'rotate(15deg)' }} />}
+
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', padding: '40px 24px 20px', position: 'relative', zIndex: 1 }}>
+          {futbLogo && <img src={futbLogo} style={{ width: '120px', height: '120px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />}
+          {mssnLogo && <img src={mssnLogo} style={{ width: '120px', height: '120px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />}
         </div>
         
-        <div style={{ fontSize: '26px', fontWeight: 700, color: '#333', textAlign: 'center', padding: '0 59px 12px', lineHeight: 1.5, letterSpacing: '1px', marginTop: '20px' }}>
-          THIS ID CARD IS THE PROPERTY OF MSSN SOCIETY FUTB CHAPTER.<br/>
-          IF FOUND PLEASE RETURN TO THE FUTB MSSN OFFICE.
+        <div style={{ position: 'relative', zIndex: 1, padding: '0 60px' }}>
+          <div style={{ background: '#f8fafc', border: '2px solid #eaeaea', borderRadius: '16px', padding: '24px', marginTop: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#111', textAlign: 'center', lineHeight: 1.6, letterSpacing: '1px' }}>
+              THIS ID CARD IS THE PROPERTY OF<br/>
+              <span style={{ color: '#165a32' }}>MSSN SOCIETY FUTB CHAPTER</span>.
+            </div>
+            <div style={{ width: '60px', height: '4px', background: '#1a3a7a', margin: '20px auto' }} />
+            <div style={{ fontSize: '22px', fontWeight: 600, color: '#444', textAlign: 'center', lineHeight: 1.5 }}>
+              IF FOUND PLEASE RETURN TO THE FUTB MSSN OFFICE<br/>
+              OR NEAREST POLICE STATION.
+            </div>
+          </div>
         </div>
         
-        <div style={{ position: 'relative', textAlign: 'center', marginTop: '35px', height: '165px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          {amirSig && <img src={amirSig} style={{ position: 'absolute', bottom: '35px', left: '50%', transform: 'translateX(-50%)', maxWidth: '472px', maxHeight: '142px', objectFit: 'contain' }} />}
-          <div style={{ fontSize: '26px', fontWeight: 700, color: '#333', position: 'relative', zIndex: 10 }}>Amir's Signature / توقيع الأمير</div>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 80px', marginTop: '30px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#333' }}>EXPIRES</div>
+            <div style={{ fontSize: '22px', fontWeight: 900, color: '#b22222', marginTop: '4px' }}>{expiryDate}</div>
+          </div>
+
+          <div style={{ textAlign: 'center', position: 'relative', height: '100px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+            {amirSig && <img src={amirSig} style={{ position: 'absolute', bottom: '30px', maxWidth: '300px', maxHeight: '100px', objectFit: 'contain' }} />}
+            <div style={{ width: '250px', borderTop: '2px solid #333', paddingTop: '8px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#333' }}>Amir's Signature / توقيع الأمير</div>
+            </div>
+          </div>
         </div>
         
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '47px', display: 'flex' }}>
+        {/* Footer Bar */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40px', display: 'flex', zIndex: 2 }}>
           <div style={{ flex: 1, background: '#165a32' }} />
           <div style={{ flex: 1, background: '#1a3a7a' }} />
           <div style={{ flex: 1, background: '#4a90c4' }} />
