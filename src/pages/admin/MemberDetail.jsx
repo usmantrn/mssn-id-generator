@@ -57,8 +57,17 @@ export default function MemberDetail() {
     setGenerating(true);
     setMsg('');
     try {
+      setMsg('🔄 Enhancing photo... This may take a few seconds.');
+      
+      // 0. Process the photo (background removal & face crop)
+      const { data } = await axios.post(`/api/admin/members/${id}/process-photo`);
+      const updatedMember = { ...member, photoUrl: data.photoUrl };
+      setMember(updatedMember);
+      
+      setMsg('🔄 Generating ID card PDF...');
+
       // 1. Generate and download PDF on the client
-      await generateAndDownloadPdf(member);
+      await generateAndDownloadPdf(updatedMember);
       
       // 2. Notify backend to mark card as generated
       await axios.post(`/api/admin/members/${id}/generate-card`);

@@ -216,8 +216,36 @@ router.post('/members', async (req, res) => {
   }
 });
 
+import { processMemberPhoto } from '../utils/cloudinary.js';
+
+// POST /api/admin/members/:id/process-photo
+router.post('/members/:id/process-photo', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const member = await prisma.member.findUnique({
+      where: { id: Number(req.params.id) },
+      select: { id: true, memberId: true, photoUrl: true }
+    });
+
+    if (!member || !member.photoUrl) {
+      return res.status(400).json({ error: 'No photo uploaded yet.' });
+    }
+
+    const newPhotoUrl = await processMemberPhoto(member.photoUrl, member.memberId);
+
+    const updatedMember = await prisma.member.update({
+      where: { id: Number(req.params.id) },
+      data: { photoUrl: newPhotoUrl }
+    });
+
+    res.json({ success: true, photoUrl: updatedMember.photoUrl });
+  } catch (err) {
+    console.error('Admin photo processing error:', err);
+    res.status(500).json({ error: 'Photo enhancement failed.' });
+  }
+});
+
 // POST /api/admin/members/:id/photo  (admin-only photo update)
-router.post('/members/:id/photo', upload.single('photo'), async (req, res) => {
+router.post('/members/:id/photo', authenticate, requireAdmin, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No photo uploaded' });
 

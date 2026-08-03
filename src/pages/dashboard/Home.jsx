@@ -22,8 +22,16 @@ export default function Home() {
     setGenerating(true);
     setMsg('');
     try {
+      setMsg('🔄 Enhancing photo... This may take a few seconds.');
+      
+      // 0. Process the photo (background removal & face crop)
+      const { data } = await axios.post('/api/members/me/process-photo');
+      const updatedUser = { ...user, ...data.member };
+      
+      setMsg('🔄 Generating ID card PDF...');
+      
       // 1. Generate and download PDF on the client
-      await generateAndDownloadPdf(user);
+      await generateAndDownloadPdf(updatedUser);
       
       // 2. Notify backend to mark card as generated
       await axios.post('/api/members/me/generate-card');

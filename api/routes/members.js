@@ -113,4 +113,35 @@ router.post('/me/generate-card', authenticate, async (req, res) => {
   }
 });
 
+import { processMemberPhoto } from '../utils/cloudinary.js';
+
+// POST /api/members/me/process-photo
+router.post('/me/process-photo', authenticate, async (req, res) => {
+  try {
+    const member = await prisma.member.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, memberId: true, photoUrl: true }
+    });
+
+    if (!member || !member.photoUrl) {
+      return res.status(400).json({ error: 'No photo uploaded yet.' });
+    }
+
+    // Process the photo using Cloudinary (crops face, removes bg)
+    const newPhotoUrl = await processMemberPhoto(member.photoUrl, member.memberId);
+
+    // Update DB with the processed photo URL
+    const updatedMember = await prisma.member.update({
+      where: { id: req.user.id },
+      data: { photoUrl: newPhotoUrl }
+    });
+
+    const { password: _, ...safe } = updatedMember;
+    res.json({ success: true, member: safe });
+  } catch (err) {
+    console.error('Photo processing error:', err);
+    res.status(500).json({ error: 'Photo enhancement failed. Please try again or skip.' });
+  }
+});
+
 export default router;
