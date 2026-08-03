@@ -142,7 +142,7 @@ export const LandscapeCard = ({ member, assets, frontRef, backRef }) => {
               <div style={{ color: '#111', fontSize: '26px', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px' }}>{name}</div>
 
               <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '12px' }}>POST:</div>
-              <div style={{ color: '#165a32', fontSize: '22px', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px', marginTop: '12px' }}>{post}</div>
+              <div style={{ color: '#111', fontSize: '22px', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px', marginTop: '12px' }}>{post}</div>
 
               <div style={{ color: '#555', fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '12px' }}>ID NO:</div>
               <div style={{ color: '#111', fontSize: '20px', fontWeight: 800, textTransform: 'uppercase', borderBottom: '2px dashed #ccc', paddingBottom: '4px', marginTop: '12px' }}>{member.memberId}</div>
